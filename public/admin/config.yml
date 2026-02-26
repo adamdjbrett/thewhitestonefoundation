@@ -1,8 +1,9 @@
+logo_url: whitestone-logo.png
+
 backend:
-  name: github
+  name: git-gateway
   repo: adamdjbrett/jcrt.org
   branch: main
-  base_url: xxxx # yourworker cloudflare
 
 media_folder: "public/images"
 public_folder: "/images"
