@@ -1,16 +1,14 @@
+
 name: Deploy Eleventy to XMIT
 
 on:
   push:
     branches: ["main", "master"]
-  schedule:
-    - cron: '0 0 * * *'
   workflow_dispatch:
     inputs:
       site:
         description: "XMIT thewhitestonefoundation.xmit.dev"
         required: true
-        default: "thewhitestonefoundation.xmit.dev@268"
         type: string
 
 concurrency:
@@ -18,38 +16,25 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
+      # Target site/domain for XMIT deploy
       XMIT_SITE: thewhitestonefoundation.xmit.dev@268
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Ambil history penuh untuk keperluan git push
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
-
-      - name: Ingest Metasearch from All Sites
-        run: node scripts/merge-metasearch.js
-
-      - name: Commit Updated Metadata
-        run: |
-          git config --global user.name "GitHub Action Bot"
-          git config --global user.email "actions@github.com"
-          git add content/page-setup/global-metasearch.json || echo "No file to add"
-          git commit -m "chore: automated daily metasearch ingest [skip ci]" || echo "No changes to commit"
-          git push || echo "Nothing to push"
 
       - name: Build Eleventy site
         run: npm run build
@@ -70,9 +55,14 @@ jobs:
             echo "XMIT_KEY secret is not set" >&2
             exit 1
           fi
+          # Use manual input when workflow_dispatch triggers this workflow
           SITE_INPUT="${{ github.event_name == 'workflow_dispatch' && inputs.site || '' }}"
           if [ -n "$SITE_INPUT" ]; then
             export XMIT_SITE="$SITE_INPUT"
+          fi
+          if [ -z "$XMIT_SITE" ]; then
+            echo "XMIT site/domain not provided. Set repo Variable 'XMIT_SITE' or pass 'site' input." >&2
+            exit 1
           fi
           echo "Deploying _site to $XMIT_SITE via XMIT CLI";
           npx -y @xmit.co/xmit "$XMIT_SITE" _site || { echo 'XMIT deploy failed' >&2; exit 1; }
@@ -81,3 +71,13 @@ jobs:
         run: |
           echo "Deployment attempt finished for $XMIT_SITE";
           echo "Visit: https://$XMIT_SITE";
+
+    # Uncomment below for an alternative raw API upload if you have endpoint details
+    # steps:
+    #   - name: Deploy via API (curl)
+    #     run: |
+    #       tar -czf site.tar.gz -C _site .
+    #       curl -f -X POST \
+    #         -H "Authorization: Bearer $XMIT_KEY" \
+    #         -F "bundle=@site.tar.gz" \
+    #         https://api.xmit.example/deploy?site=$XMIT_SITE

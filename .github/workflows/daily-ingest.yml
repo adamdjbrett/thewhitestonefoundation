@@ -1,0 +1,39 @@
+name: Daily Metasearch Ingest
+
+on:
+  schedule:
+    - cron: '0 0 * * *' 
+  workflow_dispatch: 
+
+permissions:
+  contents: write
+
+jobs:
+  ingest_and_redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Merge Script
+        run: node scripts/merge-metasearch.js
+
+      - name: Commit Updated Metadata
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "actions@github.com"
+          git add content/page-setup/global-metasearch.json
+          # Hanya commit jika ada perubahan
+          git commit -m "chore: automated daily metasearch ingestion [skip ci]" || echo "No changes to commit"
+          git push
+
+      - name: Trigger Redeploy
+        run: |
+          echo "🚀 Metasearch updated, triggering fresh build..."
+          npm install
+          npm run build

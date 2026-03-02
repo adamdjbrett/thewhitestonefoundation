@@ -53,6 +53,8 @@ export default function (eleventyConfig) {
       return (a.date || 0) - (b.date || 0);
     });
   });
+  
+
 
   eleventyConfig.addCollection("higherEd", (collectionApi) => {
     return collectionApi.getFilteredByGlob("content/posts/**/*.md").filter((post) => {

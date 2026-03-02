@@ -1,14 +1,22 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "BlogPosting",
+  "@type": "Blog",
   "headline": "{{ title }}",
+  "name": "{{ title }}",
+  "description": "{{ description or metadata.description }}",
   "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "{{ metadata.url }}{{ page.url }}"
-  }{% if image %},
-  "image": "{{ image }}"{% endif %}{% if date %},
-  "datePublished": "{{ date }}"{% endif %}{% if author %},
+  },
+  "publisher": {
+    "@type": "EducationalOrganization",
+    "name": "The Whitestone Foundation",
+    "url": "{{ metadata.url }}"
+  }
+  {% if image %}, "image": "{{ image }}"{% endif %}
+  {% if date %}, "datePublished": "{{ date }}"{% endif %}
+  {% if author %},
   "author": {
     "@type": "Person",
     "name": "{{ author }}"
