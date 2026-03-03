@@ -3,6 +3,11 @@
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "{{ metadata.title }}",
-  "url": "{{ metadata.url }}"
+  "url": "{{ metadata.url }}",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "{{ metadata.url }}/search/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
 }
 </script>

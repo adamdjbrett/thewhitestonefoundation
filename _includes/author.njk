@@ -9,7 +9,7 @@ layout: base.njk
         <img src="{{ image or metadata.image }}" 
         class="w-100 h-100" style="object-fit: cover;" alt="{{ name }}">
       </div>
-      <h1 class="serif display-5 mb-1">{{ name }}</h1>
+      <h1 class="serif display-5 mb-1 p-name">{{ name }}</h1>
       <p class="text-uppercase small tracking-widest text-secondary mb-4">{{ role }}</p>
       
       
@@ -44,7 +44,7 @@ layout: base.njk
   {% for p in authorPosts %}
     {% if p.data.author == key %}
       {% set count = count + 1 %}
-      <div class="col-md-6 col-lg-4">
+      <div class="col-md-6 col-lg-4 e-content">
         <a href="{{ p.url }}" class="v-article-card text-decoration-none text-secondary d-block h-100">
           <div class="v-img-frame mb-3 rounded shadow-sm" style="aspect-ratio: 16/9; overflow: hidden;">
             <img src="{{ p.data.image or metadata.image }}" class="w-100 h-100" style="object-fit: cover;">
