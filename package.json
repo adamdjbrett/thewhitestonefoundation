@@ -7,7 +7,7 @@
     "build": "npx @11ty/eleventy && npx pagefind --site _site --glob \"**/*.html\""
   },
   "dependencies": {
-    "@11ty/eleventy": "^3.1.2",
+    "@11ty/eleventy": "^3.1.6",
     "@11ty/eleventy-navigation": "^1.0.5",
     "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.2",
     "eleventy-plugin-toc": "^1.1.5",
@@ -18,5 +18,10 @@
     "markdown-it-footnote": "^4.0.0",
     "markdown-it-table-of-contents": "^0.8.0",
     "pagefind": "^1.4.0"
-  }
+  },
+  "engines": {
+    "node": ">=24",
+    "npm": ">=11.14.0"
+  },
+  "packageManager": "npm@11.14.0"
 }
