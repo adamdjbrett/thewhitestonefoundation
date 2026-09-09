@@ -22,12 +22,12 @@ jobs:
     env:
       XMIT_SITE: thewhitestonefoundation.xmit.dev@268
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
       - run: npm install
       - run: node scripts/merge-metasearch.js
@@ -44,4 +44,15 @@ jobs:
           XMIT_KEY: ${{ secrets.XMIT_KEY }}
         run: |
           SITE="${{ github.event_name == 'workflow_dispatch' && inputs.site || env.XMIT_SITE }}"
-          npx -y @xmit.co/xmit "$SITE" _site
+          for attempt in 1 2 3; do
+            echo "::group::XMIT upload attempt $attempt/3"
+            if npx -y @xmit.co/xmit "$SITE" _site; then
+              echo "::endgroup::"
+              exit 0
+            fi
+            echo "::endgroup::"
+            echo "::warning::XMIT upload attempt $attempt failed"
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt * 30)); fi
+          done
+          echo "::error::XMIT upload failed after 3 attempts"
+          exit 1
